@@ -3,9 +3,12 @@
 #### 介绍
 vue组件：抽屉
 
+#### 效果图
+![blockchain](effect.PNG "效果图")
+
 #### 全局注册
 
-import drawer from './drawer'
+import drawer from './drawer/drawer.vue'  
 Vue.component('drawer', drawer)
 
 #### 使用说明
@@ -25,7 +28,7 @@ Vue.component('drawer', drawer)
 |       width             |          侧栏宽度                 |           string |                  ——        |             500px|
 |       align             |         侧栏位置                  |          string  |               right,left   |            right|
 |   close-on-click-modal  |     点击遮罩层是否关闭                 |       boolean    |              ——            |         false|
-|
+
 ##### Events
 |事件|说明|默认值|
 |:---- |:---|-----   |
@@ -36,7 +39,7 @@ Vue.component('drawer', drawer)
 #### slot
 |slot|说明|默认值|
 |:---- |:---|-----   |
-| footer    |  Dialog 按钮操作区的内容| ——  | 
+| footer    |  底部操作区的内容| ——  | 
 
 #### 例子 (简单）
 ````
@@ -78,9 +81,11 @@ Vue.component('drawer', drawer)
    </div>
  </drawer>
 ````
-#### 参与贡献
+#### 开发者 & 其他
 
 * @title 原生vue抽屉组件
-* @author 易建伟
+* @author 遗忘
 * @time 2019-07-04
+* @QQ 1786787613
+* @other 欢迎提交bug，请写清楚遇到问题的原因，开发环境，复显步骤。
 

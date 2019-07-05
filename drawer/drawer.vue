@@ -5,7 +5,7 @@
 *
 * ------------使用-------------
 * 全局注册
-* import drawer from './drawer'
+* import drawer from '/drawer.vue'
 * Vue.component('drawer', drawer)
 *
 * 方法或属性
@@ -30,7 +30,7 @@
 *      close                 Dialog 关闭的回调
 *      closed                  Dialog 关闭动画结束时的回调
 * ------------------------------------------------------ slot  -------------------------------------------
-*      footer                  Dialog 按钮操作区的内容
+*      footer                  底部操作区的内容
 * 例子 (简单）
 * <drawer
 *   title="测试"
