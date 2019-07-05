@@ -1,0 +1,22 @@
+{
+  "name": "vue-drawer",
+  "version": "0.0.1",
+  "description": "A Vue drawer",
+  "main": "drawer/drawer.vue",
+  "bin": "drawer.vue",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitee.com/yiforget/vue-drawer.git"
+  },
+  "keywords": [
+    "drawer",
+    "vue"
+  ],
+  "author": "forget",
+  "license": "MIT",
+  "homepage": "https://gitee.com/yiforget/vue-drawer#readme",
+  "_from": "vue-drawer@0.0.1"
+}
