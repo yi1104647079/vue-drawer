@@ -13,10 +13,12 @@ Vue.component('drawer', drawer)
 
 #### 使用说明
 ##### Attributes
-|属性|说明|可选值|默认值|
-|:----    |:---|:----- |-----   |
-|     visible.sync        |    是否显示 Dialog，支持 .sync 修饰符   |      boolean     |             ——             |       false|
-|      title              |           标题名称                |           string |                            |            标题|
+|属性|说明|类型|可选值|默认值|
+|:----    |:---|:-----|:----- |-----   |
+|     visible.sync        |    是否显示Dialog，支持 .sync 修饰符   |      boolean     |             ——             |       false|
+|     loading.sync        |    是否显示加载图标，支持 .sync 修饰符   |      boolean     |             ——             |       false|
+|     loadingColor        |    加载图标颜色                       |      string     |             ——             |       #409EFF|
+|      title              |           标题名称                |           string |                 ——          |            标题|
 |      headerShow         |       标题头部是否显示                |       boolean    |               ——           |         true|
 |   header-background     |       标题头部背景颜色                |       string     |               ——           |          #fff|
 |     closeBtnShow        |        关闭按钮是否显示               |        boolean   |                 ——         |         true|
@@ -65,6 +67,8 @@ Vue.component('drawer', drawer)
    width="500px"
    align="right"
    close-on-click-modal
+   :loading.sync="loading"
+   loadingColor="#ff6700"
    @close="text"
    @closed="text"
    @open="text"

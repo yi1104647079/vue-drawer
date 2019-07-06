@@ -5,13 +5,15 @@
 *
 * ------------使用-------------
 * 全局注册
-* import drawer from '/drawer.vue'
+* import drawer from './drawer'
 * Vue.component('drawer', drawer)
 *
 * 方法或属性
 *  Attributes || Events || slot       说明                                   类型                   可选值                    默认值
 * ------------------------------------------------------ Attributes -------------------------------------------
 *     visible.sync            是否显示 Dialog，支持 .sync 修饰符            boolean                   ——                      false
+*      loading.sync               是否显示 加载图标，支持 .sync 修饰符            boolean                   ——                     false
+*     loadingColor                  加载图标颜色                           string                    ——                     #409EFF
 *      title                         标题名称                              string                                            标题
 *      headerShow                标题头部是否显示                          boolean                    ——                      true
 *   header-background            标题头部背景颜色                          string                     ——                       #fff
@@ -30,43 +32,45 @@
 *      close                 Dialog 关闭的回调
 *      closed                  Dialog 关闭动画结束时的回调
 * ------------------------------------------------------ slot  -------------------------------------------
-*      footer                  底部操作区的内容
+*      footer                  底部内容区域
 * 例子 (简单）
 * <drawer
-*   title="测试"
-*   :visible.sync='dialogVisible'
-*   width="500px"
-*   close-on-click-modal
-* >
-* </drawer>
+        *   title="测试"
+        *   :visible.sync='dialogVisible'
+        *   width="500px"
+        *   close-on-click-modal
+        * >
+  * </drawer>
 * 例子（完整属性）
 * <drawer
-*   :visible.sync='dialogVisible'
-*   :headerShow="true"
-*   header-background="#f5f5f5"
-*   title-color="#000"
-*   main-background="#EBEEF5"
-*   :footerShow="true"
-*   footer-height="60px"
-*   footer-background="#f5f5f5"
-*   width="500px"
-*   align="right"
-*   close-on-click-modal
-*   @close="ce"
-*   @closed="ce"
-*   @open="ce"
-*   @opend="ce"
-*    >
-*   <!--内容区-->
-*   <div>
-*     <p>内容</p>
-*   </div>
-*
-*   <!--这里是底部-->
-*   <div slot="footer">
-*     <p>底部</p>
-*   </div>
-* </drawer>
+        *   :visible.sync='dialogVisible'
+        *   :headerShow="true"
+        *   header-background="#f5f5f5"
+        *   title-color="#000"
+        *   main-background="#EBEEF5"
+        *   :footerShow="true"
+        *   footer-height="60px"
+        *   footer-background="#f5f5f5"
+        *   width="500px"
+        *   align="right"
+        *   close-on-click-modal
+        *   :loading.sync="loading"
+        *   loadingColor="#ff6700"
+        *   @close="ce"
+        *   @closed="ce"
+        *   @open="ce"
+        *   @opend="ce"
+        *    >
+  *   <!--内容区-->
+  *   <div>
+  *     <p>内容</p>
+  *   </div>
+  *
+  *   <!--这里是底部-->
+  *   <div slot="footer">
+  *     <p>底部</p>
+  *   </div>
+  * </drawer>
 */
 
 <!--功能代码-->
@@ -74,10 +78,21 @@
   <transition name="drawer" @before-enter="drawerBeforeEnter" @enter="drawerEnter" @after-enter="drawerAfterEnter" @leave="drawerleave" @before-leave="drawerbeforeLeave" v-on:after-leave="drawerafterLeave">
     <div class="drawer" v-if="visible" @click="drawerHide">
       <transition name="drawerC" @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter" @leave="leave" @after-leave="afterLeave">
-        <div class="Eject" :style="{'width':width?width:'500px','float':aligns}" v-if="isshow" @click.stop="eject" ref="eject">
+        <div class="Eject" :style="{'width':width?width:'500px','float':aligns}" v-if="jdShow" @click.stop="eject" ref="eject">
+          <!--加载中-->
+          <div class="loading" v-if="loading == undefined?false:loading">
+            <div class="loader" title="2">
+              <svg version="1.1" id="loader-1" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;">
+                <path d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z" :fill="loadingColor?loadingColor:'#409EFF'">
+                  <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.8s" repeatCount="indefinite"/>
+                </path>
+              </svg>
+              <p style="color: #606266;">加载中</p>
+            </div>
+          </div>
           <header
-            v-if="headerShow == undefined?true:headerShow"
-            :style="{'background':headerBackground?headerBackground:'#fff'}">
+                  v-if="headerShow == undefined?true:headerShow"
+                  :style="{'background':headerBackground?headerBackground:'#fff'}">
             <span class="title" :style="{'color':titleColor?titleColor+'!important':''}">{{title?title:"标题"}}</span>
             <span @click.stop="close" class="close" v-if="closeBtnShow == undefined?true:closeBtnShow">x</span>
           </header>
@@ -85,8 +100,8 @@
             <slot></slot>
           </main>
           <footer
-            v-if="footerShow?footerShow:false"
-            :style="{'height':footerHeight?footerHeight:'60px','background':footerBackground?footerBackground:'#fff'}">
+                  v-if="footerShow?footerShow:false"
+                  :style="{'height':footerHeight?footerHeight:'60px','background':footerBackground?footerBackground:'#fff'}">
             <slot name="footer"></slot>
           </footer>
         </div>
@@ -97,13 +112,13 @@
 <script>
   export default {
     name:'demo',
-    props:["title","closeBtnShow","footerShow","footerHeight","width","visible","footerBackground","headerShow","headerBackground","titleColor","mainBackground","align","closeOnClickModal"],
+    props:["title","closeBtnShow","footerShow","footerHeight","width","visible","footerBackground","headerShow","headerBackground","titleColor","mainBackground","align","closeOnClickModal","loading","loadingColor"],
     data() {
       return {
-        isshow: false,
+        jdShow: false,
         timer: undefined,
         aligns: "right",
-        index: 0
+        index: 0,
       }
     },
     watch:{
@@ -113,12 +128,18 @@
         }else{
 
         }
-      }
+      },
+      loading(newVal,oldVal){
+        if(newVal){
+          //显示的时候
+        }else{
+
+        }
+      },
     },
     created(){
-      this.isshow = this.visible?this.visible:false
+      this.jdShow = this.visible?this.visible:false
       if(this.align){
-        console.log(this.align)
         if(this.align != 'right' && this.align != 'left'){
           this.align = 'right'
           alert("目前只支持right和left")
@@ -142,8 +163,11 @@
           this.$emit("update:visible",!this.visible);
         },10)
         this.index = 1
-        this.isshow = false
+        this.jdShow = false
         this.$emit("close")
+        if(this.loading != undefined){
+          this.$emit("update:loading",!this.loading);
+        }
       },
       //点击遮罩层隐藏
       drawerHide(){
@@ -184,7 +208,7 @@
       },
       //关闭动画
       leave(el){
-       this.beforeEnter(el,0.2)
+        this.beforeEnter(el,0.2)
       },
       //关闭动画结束
       afterLeave(){
@@ -206,7 +230,7 @@
       },
       //遮罩动画结束之后
       drawerAfterEnter(el){
-        this.isshow = true
+        this.jdShow = true
         this.$emit("opend")
       },
       drawerleave(el){
@@ -224,7 +248,7 @@
       drawerafterLeave(){
         clearTimeout(this.timer)
         this.timer = undefined
-        this.isshow = false
+        this.jdShow = false
         this.index =  0
       }
     }
@@ -247,6 +271,14 @@
     display: flex;
     flex-direction: column;
     transition: 1s;
+    position: relative;
+  }
+  .loading{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: hsla(0,0%,100%,.9);
+    /*background-color: rgba(0,0,0,0.7);*/
   }
   header {
     padding: 0 20px;
@@ -269,6 +301,7 @@
     font-size: 18px;
     color: #909399;
     cursor: pointer;
+    z-index: 2100;
   }
   .close:hover{
     color: #409EFF;
@@ -286,16 +319,16 @@
   }
   /*滚动条凹槽的颜色，还可以设置边框属性*/
   ::-webkit-scrollbar-track-piece {
-  background-color:#f8f8f8;
+    background-color:#f8f8f8;
   }
   /*滚动条的宽度*/
   ::-webkit-scrollbar {
-  width:9px;
+    width:9px;
     height:9px;
   }
   /*滚动条的设置*/
   ::-webkit-scrollbar-thumb {
-  background-color:#C0C4CC;
+    background-color:#C0C4CC;
     background-clip:padding-box;
     min-height:28px;
     border-radius: 10px;
@@ -303,4 +336,24 @@
   ::-webkit-scrollbar-thumb:hover {
     background-color:#bbb;
   }
+  /*加载样式*/
+  .loader {
+    height: 100px;
+    width: 20%;
+    text-align: center;
+    padding: 1em;
+    display: inline-block;
+    vertical-align: top;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+  }
+  /*
+    Set the color of the icon
+  */
+  /*svg path{*/
+  /*  fill: #409EFF;*/
+  /*}*/
+
 </style>
