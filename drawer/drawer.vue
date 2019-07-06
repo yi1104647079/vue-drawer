@@ -130,11 +130,6 @@
         }
       },
       loading(newVal,oldVal){
-        if(newVal){
-          //显示的时候
-        }else{
-
-        }
       },
     },
     created(){

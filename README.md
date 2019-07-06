@@ -41,7 +41,7 @@ Vue.component('drawer', drawer)
 #### slot
 |slot|说明|默认值|
 |:---- |:---|-----   |
-| footer    |  底部操作区的内容| ——  | 
+| footer   |  底部操作区的内容| ——  | 
 
 #### 例子 (简单）
 ````
