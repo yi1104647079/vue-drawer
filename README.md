@@ -27,8 +27,9 @@ Vue.component('drawer', drawer)
 |   footerShow            |        底部是否显示                 |         boolean  |                 ——         |            false|
 |   footer-height         |          底部高度                 |           string |                  ——        |              60px|
 |   footer-background     |       底部背景颜色                  |         string   |                 ——         |             #fff|
-|       width             |          侧栏宽度                 |           string |                  ——        |             500px|
-|       align             |         侧栏位置                  |          string  |               right,left   |            right|
+|       width             |   侧栏宽度(align为right,left生效)  |           string |                  ——        |             500px|
+|       height             |  侧栏高度(align为top,bottom生效)  |           string |                  ——        |             300px|
+|       align             |         侧栏位置                  |          string  |    top,bottom,right,left   |            right|
 |   close-on-click-modal  |     点击遮罩层是否关闭                 |       boolean    |              ——            |         false|
 
 ##### Events
@@ -65,6 +66,7 @@ Vue.component('drawer', drawer)
    footer-height="60px"
    footer-background="#f5f5f5"
    width="500px"
+   height="300px"
    align="right"
    close-on-click-modal
    :loading.sync="loading"

@@ -12,7 +12,7 @@
 *  Attributes || Events || slot       说明                                   类型                   可选值                    默认值
 * ------------------------------------------------------ Attributes -------------------------------------------
 *     visible.sync            是否显示 Dialog，支持 .sync 修饰符            boolean                   ——                      false
-*      loading.sync               是否显示 加载图标，支持 .sync 修饰符            boolean                   ——                     false
+*      loading                是否显示 加载图标，支持 .sync 修饰符            boolean                   ——                     false
 *     loadingColor                  加载图标颜色                           string                    ——                     #409EFF
 *      title                         标题名称                              string                                            标题
 *      headerShow                标题头部是否显示                          boolean                    ——                      true
@@ -23,8 +23,9 @@
 *   footerShow                    底部是否显示                             boolean                    ——                       false
 *   footer-height                   底部高度                               string                    ——                        60px
 *   footer-background            底部背景颜色                              string                     ——                        #fff
-*       width                       侧栏宽度                               string                    ——                       500px
-*       align                      侧栏位置                               string                  right,left                 right
+*       width              侧栏宽度(align为right,left生效)                  string                    ——                       500px
+*       height             侧栏高度(align为top,bottom生效)                 string                    ——                       300px
+*       align                      侧栏位置                               string              top,bottom,right,left          right
 *   close-on-click-modal       点击遮罩层是否关闭                           boolean                   ——                       false
 * ------------------------------------------------------ Events -------------------------------------------
 *      open                    Dialog 打开的回调
@@ -33,52 +34,49 @@
 *      closed                  Dialog 关闭动画结束时的回调
 * ------------------------------------------------------ slot  -------------------------------------------
 *      footer                  底部内容区域
-* 例子 (简单）
-* <drawer
-        *   title="测试"
-        *   :visible.sync='dialogVisible'
-        *   width="500px"
-        *   close-on-click-modal
-        * >
-  * </drawer>
-* 例子（完整属性）
-* <drawer
-        *   :visible.sync='dialogVisible'
-        *   :headerShow="true"
-        *   header-background="#f5f5f5"
-        *   title-color="#000"
-        *   main-background="#EBEEF5"
-        *   :footerShow="true"
-        *   footer-height="60px"
-        *   footer-background="#f5f5f5"
-        *   width="500px"
-        *   align="right"
-        *   close-on-click-modal
-        *   :loading.sync="loading"
-        *   loadingColor="#ff6700"
-        *   @close="ce"
-        *   @closed="ce"
-        *   @open="ce"
-        *   @opend="ce"
-        *    >
-  *   <!--内容区-->
-  *   <div>
-  *     <p>内容</p>
-  *   </div>
-  *
-  *   <!--这里是底部-->
-  *   <div slot="footer">
-  *     <p>底部</p>
-  *   </div>
-  * </drawer>
 */
+<!--* 例子 (简单）
+ <drawer
+   title="测试"
+   :visible.sync='dialogVisible'
+   width="500px"
+   close-on-click-modal>
+ </drawer>
+ 例子（完整属性）
+ <drawer
+   :visible.sync='dialogVisible'
+   :headerShow="true"
+   header-background="#f5f5f5"
+   title-color="#000"
+   main-background="#EBEEF5"
+   :footerShow="true"
+   footer-height="60px"
+   footer-background="#f5f5f5"
+   width="500px"
+   height="300px"
+   align="right"
+   close-on-click-modal
+   :loading.sync="loading"
+   loadingColor="#ff6700"
+   @close="ce"
+   @closed="ce"
+   @open="ce"
+   @opend="ce">
+   <div>
+     <p>内容</p>
+   </div>
+   <div slot="footer">
+     <p>底部</p>
+   </div>
+ </drawer>
+-->
 
 <!--功能代码-->
 <template>
   <transition name="drawer" @before-enter="drawerBeforeEnter" @enter="drawerEnter" @after-enter="drawerAfterEnter" @leave="drawerleave" @before-leave="drawerbeforeLeave" v-on:after-leave="drawerafterLeave">
     <div class="drawer" v-if="visible" @click="drawerHide">
       <transition name="drawerC" @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter" @leave="leave" @after-leave="afterLeave">
-        <div class="Eject" :style="{'width':width?width:'500px','float':aligns}" v-if="jdShow" @click.stop="eject" ref="eject">
+        <div :class="['Eject',aligns == 'left'?'EjectLeft':aligns == 'right'?'EjectRight':aligns == 'top'?'EjectTop':aligns == 'bottom'?'EjectBottom':'EjectRight']" :style="{'width':widths,'height':heights}" v-if="jdShow" @click.stop="eject" ref="eject">
           <!--加载中-->
           <div class="loading" v-if="loading == undefined?false:loading">
             <div class="loader" title="2">
@@ -112,13 +110,15 @@
 <script>
   export default {
     name:'demo',
-    props:["title","closeBtnShow","footerShow","footerHeight","width","visible","footerBackground","headerShow","headerBackground","titleColor","mainBackground","align","closeOnClickModal","loading","loadingColor"],
+    props:["title","closeBtnShow","footerShow","footerHeight","width","height","visible","footerBackground","headerShow","headerBackground","titleColor","mainBackground","align","closeOnClickModal","loading","loadingColor"],
     data() {
       return {
         jdShow: false,
         timer: undefined,
         aligns: "right",
         index: 0,
+        heights: '',
+        widths: ''
       }
     },
     watch:{
@@ -130,19 +130,40 @@
         }
       },
       loading(newVal,oldVal){
+        if(newVal){
+          //显示的时候
+        }else{
+
+        }
       },
     },
     created(){
       this.jdShow = this.visible?this.visible:false
       if(this.align){
-        if(this.align != 'right' && this.align != 'left'){
-          this.align = 'right'
-          alert("目前只支持right和left")
-        }else{
-          this.aligns = this.align
+        this.aligns = this.align
+        if(this.aligns == 'right' || this.aligns == 'left'){
+          if(!this.width){
+            this.widths = '500px'
+          }else{
+            this.widths = this.width
+          }
+          this.heights = '100%'
+        }else if(this.aligns == 'top' || this.aligns == 'bottom'){
+          if(!this.height){
+            this.heights = '300px'
+          }else{
+            this.heights = this.height
+          }
+          this.widths = '100%'
         }
       }else{
         this.aligns = 'right'
+        if(!this.width){
+          this.widths = '500px'
+        }else{
+          this.widths = this.width
+        }
+        this.heights = '100%'
       }
     },
     mounted(){
@@ -161,7 +182,7 @@
         this.jdShow = false
         this.$emit("close")
         if(this.loading != undefined){
-          this.$emit("update:loading",!this.loading);
+          this.$emit("update:loading",false);
         }
       },
       //点击遮罩层隐藏
@@ -175,20 +196,29 @@
       //侧栏动画开始之前
       beforeEnter(el,time = 0.4){
         let wid = '500px'
+        let hit = '300px'
         if(this.width){
           wid = this.width
         }
+        if(this.height){
+          hit = this.height
+        }
+        el.style.transition = "all "+time+"s ease"
         switch(this.aligns){
           case "left":
             el.style.transform = "translate(-"+wid+",0px)"
-            el.style.transition = "all "+time+"s ease"
             break;
           case "right":
             el.style.transform = "translate("+wid+",0px)"
-            el.style.transition = "all "+time+"s ease"
+            break;
+          case "bottom":
+            el.style.transform = "translate(0px,"+hit+")"
+            break;
+          case "top":
+            el.style.transform = "translate(0px,-"+hit+")"
             break;
           default:
-            alert("目前只支持right和left")
+            alert("目前只支持top,bottom,left,right")
         }
       },
       //侧栏动画结束
@@ -259,14 +289,31 @@
     height: 100%;
     background-color: rgba(0,0,0,0.4);
     transition: 1s;
+    overflow: hidden;
   }
   .Eject{
-    height: 100%;
+    position: absolute;
     background-color: #fff;
     display: flex;
     flex-direction: column;
     transition: 1s;
-    position: relative;
+  }
+  .EjectTop{
+    left: 0;
+    top: 0;
+  }
+  .EjectBottom{
+    left: 0;
+    bottom: 0;
+  }
+  .EjectLeft{
+    left: 0;
+    top: 0;
+  }
+  .EjectRight{
+    right: 0px;
+    top: 0;
+    margin: 0;
   }
   .loading{
     position: absolute;
