@@ -336,6 +336,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align：left;
   }
   .close{
     width: 30px;
@@ -391,11 +392,5 @@
     left: 50%;
     transform: translate(-50%,-50%);
   }
-  /*
-    Set the color of the icon
-  */
-  /*svg path{*/
-  /*  fill: #409EFF;*/
-  /*}*/
 
 </style>
