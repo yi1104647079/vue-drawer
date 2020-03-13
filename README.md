@@ -30,6 +30,7 @@ Vue.component('drawer', drawer)
 |       width             |   侧栏宽度(align为right,left生效)  |           string |                  ——        |             500px|
 |       height             |  侧栏高度(align为top,bottom生效)  |           string |                  ——        |             300px|
 |       align             |         侧栏位置                  |          string  |    top,bottom,right,left   |            right|
+|       modal             |       是否显示遮罩层                 |       boolean    |              ——            |         true|
 |   close-on-click-modal  |     点击遮罩层是否关闭                 |       boolean    |              ——            |         false|
 
 ##### Events
@@ -42,6 +43,7 @@ Vue.component('drawer', drawer)
 #### slot
 |slot|说明|默认值|
 |:---- |:---|-----   |
+| header   |  头部操作区的内容| ——  |
 | footer   |  底部操作区的内容| ——  | 
 
 #### 例子 (简单）
@@ -68,6 +70,7 @@ Vue.component('drawer', drawer)
    width="500px"
    height="300px"
    align="right"
+   :modal="true"
    close-on-click-modal
    :loading.sync="loading"
    loadingColor="#ff6700"
@@ -76,6 +79,10 @@ Vue.component('drawer', drawer)
    @open="text"
    @opend="text"
     >
+     <div slot="header">
+       <p>头部</p>
+     </div>
+
    <!--内容区-->
    <div>
      <p>内容</p>

@@ -26,6 +26,7 @@
 *       width              侧栏宽度(align为right,left生效)                  string                    ——                       500px
 *       height             侧栏高度(align为top,bottom生效)                 string                    ——                       300px
 *       align                      侧栏位置                               string              top,bottom,right,left          right
+*       modal                     是否显示遮罩层                           boolean                   ——                      true
 *   close-on-click-modal       点击遮罩层是否关闭                           boolean                   ——                       false
 * ------------------------------------------------------ Events -------------------------------------------
 *      open                    Dialog 打开的回调
@@ -33,6 +34,7 @@
 *      close                 Dialog 关闭的回调
 *      closed                  Dialog 关闭动画结束时的回调
 * ------------------------------------------------------ slot  -------------------------------------------
+*      header                  头部内容区域
 *      footer                  底部内容区域
 */
 <!--* 例子 (简单）
@@ -55,6 +57,7 @@
    width="500px"
    height="300px"
    align="right"
+   :modal="true"
    close-on-click-modal
    :loading.sync="loading"
    loadingColor="#ff6700"
@@ -62,6 +65,9 @@
    @closed="ce"
    @open="ce"
    @opend="ce">
+   <div slot="header">
+     <p>内容</p>
+   </div>
    <div>
      <p>内容</p>
    </div>
@@ -74,7 +80,10 @@
 <!--功能代码-->
 <template>
     <transition name="drawer" @before-enter="drawerBeforeEnter" @enter="drawerEnter" @after-enter="drawerAfterEnter" @leave="drawerleave" @before-leave="drawerbeforeLeave" v-on:after-leave="drawerafterLeave">
-        <div class="drawer" v-if="visible" @click="drawerHide">
+
+
+
+        <div class="drawer" v-if="visible" @click="drawerHide" :style="{'background-color':modalShow?'rgba(0,0,0,0.4)':''}">
             <transition name="drawerC" @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter" @leave="leave" @after-leave="afterLeave">
                 <div :class="['Eject',aligns == 'left'?'EjectLeft':aligns == 'right'?'EjectRight':aligns == 'top'?'EjectTop':aligns == 'bottom'?'EjectBottom':'EjectRight']" :style="{'width':widths,'height':heights}" v-if="jdShow" @click.stop="eject" ref="eject">
                     <!--加载中-->
@@ -91,8 +100,12 @@
                     <header
                             v-if="headerShow == undefined?true:headerShow"
                             :style="{'background':headerBackground?headerBackground:'#fff'}">
-                        <span class="title" :style="{'color':titleColor?titleColor+'!important':''}">{{title?title:"标题"}}</span>
-                        <span @click.stop="close" class="close" v-if="closeBtnShow == undefined?true:closeBtnShow">x</span>
+                        <div class="headDiv" v-if="!headerSlot">
+                            <span class="title" :style="{'color':titleColor?titleColor+'!important':''}">{{title?title:"标题"}}</span>
+                            <span @click.stop="close" class="close" v-if="closeBtnShow == undefined?true:closeBtnShow">x</span>
+                        </div>
+
+                        <slot name="header"></slot>
                     </header>
                     <main :style="{'background':mainBackground?mainBackground:'#fff'}">
                         <slot></slot>
@@ -110,15 +123,16 @@
 <script>
     export default {
         name:'demo',
-        props:["title","closeBtnShow","footerShow","footerHeight","width","height","visible","footerBackground","headerShow","headerBackground","titleColor","mainBackground","align","closeOnClickModal","loading","loadingColor"],
+        props:["title","closeBtnShow","footerShow","footerHeight","width","height","visible","footerBackground","headerShow","headerBackground","titleColor","mainBackground","align","closeOnClickModal","loading","loadingColor","modal"],
         data() {
             return {
                 jdShow: false,
                 timer: undefined,
                 aligns: "right",
-                index: 0,
                 heights: '',
-                widths: ''
+                widths: '',
+                headerSlot: false, //头部插槽
+                modalShow: true, //遮罩层
             }
         },
         watch:{
@@ -138,6 +152,7 @@
             },
         },
         created(){
+            this.modalShow = this.modal == undefined? true : this.modal
             this.jdShow = this.visible?this.visible:false;
             if(this.align){
                 this.aligns = this.align
@@ -184,23 +199,22 @@
             }
         },
         mounted(){
-
+            if(this.$scopedSlots.header){
+                this.headerSlot = true
+            }
         },
         beforeDestroy(){
-            clearTimeout(this.timer)
         },
         methods: {
             //关闭按钮
             close() {
-                this.timer = setTimeout(()=> {
-                    this.$emit("update:visible",!this.visible);
-                },10)
-                this.index = 1
+                this.$emit("update:visible",false);
                 this.jdShow = false
                 this.$emit("close")
                 if(this.loading != undefined){
                     this.$emit("update:loading",false);
                 }
+
             },
             //点击遮罩层隐藏
             drawerHide(){
@@ -241,10 +255,8 @@
             //侧栏动画结束
             enter(el,done){
                 el.offsetWidth
-                // el.style.transform = "translate(0px,0px)"
-                //为解决transform对position:fixed的影响
-                el.style.transform = "none";
-                el.style.transition = "all 0.4s ease";
+                el.style.transform = "translate(0px,0px)"
+                el.style.transition = "all 0.4s ease"
                 done()
             },
             //侧栏动画结束之后
@@ -268,7 +280,9 @@
             //遮罩动画结束
             drawerEnter(el,done){
                 el.offsetWidth
-                el.style.backgroundColor = "rgba(0,0,0,0.4)"
+                if(this.modalShow){
+                    el.style.backgroundColor = "rgba(0,0,0,0.4)"
+                }
                 el.style.transition = "all 0.4s ease"
                 done()
             },
@@ -284,16 +298,11 @@
             },
             //遮罩层隐藏
             drawerbeforeLeave(){
-                if (this.index == 0){
-                    this.beforeEnter(this.$refs.eject,0.2)
-                }
+                this.beforeEnter(this.$refs.eject,0.2)
             },
             //遮罩层隐藏之后
             drawerafterLeave(){
-                clearTimeout(this.timer)
-                this.timer = undefined
                 this.jdShow = false
-                this.index =  0
             }
         }
     }
@@ -306,7 +315,7 @@
         left: 0;
         z-index: 2000;
         height: 100%;
-        background-color: rgba(0,0,0,0.4);
+
         transition: 1s;
         overflow: hidden;
     }
@@ -316,6 +325,7 @@
         display: flex;
         flex-direction: column;
         transition: 1s;
+        box-shadow: 10px -20px 10px 10px rgba(0,0,0,0.2);
     }
     .EjectTop{
         left: 0;
@@ -343,10 +353,13 @@
         /*background-color: rgba(0,0,0,0.7);*/
     }
     header {
-        padding: 0 20px;
         border-bottom: 1px solid #e8eaec;
-        line-height: 50px;
+    }
+    .headDiv{
+        height: 100%;
         display: flex;
+        padding: 0 20px;
+        line-height: 50px;
     }
     .title{
         flex: 1;
